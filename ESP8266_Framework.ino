@@ -1,5 +1,5 @@
 
-#define _FW_VERSION "v1.0.0 (16-05-2020)"
+#define _FW_VERSION "v1.1.0 (07-06-2020)"
 
 
 #define _HOSTNAME   "ESP8266framework"
@@ -55,7 +55,15 @@ void setup()
   digitalWrite(LED_BUILTIN, LOW);
 
   startMDNS(settingHostname);
-  startNTP();
+  
+  //--- ezTime initialisation
+  setDebug(INFO);  
+  waitForSync(); 
+  CET.setLocation(F("Europe/Amsterdam"));
+  CET.setDefault(); 
+  
+  Debugln("UTC time: "+ UTC.dateTime());
+  Debugln("CET time: "+ CET.dateTime());
 
   snprintf(cMsg, sizeof(cMsg), "Last reset reason: [%s]\r", ESP.getResetReason().c_str());
   DebugTln(cMsg);
@@ -89,10 +97,16 @@ void setup()
 //=====================================================================
 void loop()
 {
-  handleNTP();
   httpServer.handleClient();
   MDNS.update();
+  events(); // trigger ezTime update etc.
 
   //--- Eat your hart out!
-  
+    
+  if (millis() > blinkyTimer)
+  {
+    blinkyTimer = millis() + 2000;
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  }
+
 } // loop()
