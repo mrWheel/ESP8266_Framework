@@ -68,6 +68,7 @@ void configModeCallback (WiFiManager *myWiFiManager)
 //===========================================================================================
 void startWiFi(const char* hostname, int timeOut) 
 {
+  WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
   WiFiManager manageWiFi;
   uint32_t lTime = millis();
   String thisAP = String(hostname) + "-" + WiFi.macAddress();
